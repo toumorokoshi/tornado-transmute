@@ -55,6 +55,21 @@ def _add_transmute_func_to_handler(transmute_func, handler):
 def _generate_handler_method(transmute_func):
 
     def method(self):
-        self.write({})
+        try:
+            result = transmute_func.raw_func()
+            self.set_header("Content-Type", "application/json")
+            self.write({
+                "success": True,
+                "result": result
+            })
+        except Exception as e:
+            if (transmute_func.error_exceptions and
+               isinstance(e, transmute_func.error_exceptions)):
+                self.write({
+                    "success": False,
+                    "details": str(e)
+                })
+            else:
+                raise
 
     return method
