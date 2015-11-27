@@ -56,7 +56,8 @@ def _generate_handler_method(transmute_func):
 
     def method(self):
         try:
-            result = transmute_func.raw_func()
+            kwargs = _extract_args(self, transmute_func)
+            result = transmute_func.raw_func(**kwargs)
             self.set_header("Content-Type", "application/json")
             self.write({
                 "success": True,
@@ -73,3 +74,7 @@ def _generate_handler_method(transmute_func):
                 raise
 
     return method
+
+
+def _extract_args(handler, transmute_func):
+    kwargs = {}

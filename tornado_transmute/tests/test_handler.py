@@ -18,17 +18,9 @@ class TestApp(tornado.testing.AsyncHTTPTestCase):
         assert resp_json.get("result") == "Foo"
 
 
-def _get_route_set():
-    route_set = tornado_transmute.TornadoRouteSet()
-    route_set.route_function("/foo", test_foo)
-    route_set.route_function("/triple", triple)
-    return route_set.generate_handlers()
+class ExampleHandler(tornado.web.RequestHandler):
 
-
-def test_foo():
-    return "Foo"
-
-
-@flask_transmute.annotate({"triple": int, "return": int})
-def triple(value):
-    return value * 2
+    @tornado_transmute.handle_args
+    @tornado_transmute.annotate({"resource": str, "multiplier": int})
+    def get(self, resource, multiplier=None):
+        pass
