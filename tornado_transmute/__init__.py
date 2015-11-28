@@ -1,6 +1,9 @@
 import tornado.web
 from flask_transmute.routeset import RouteSet
 from .handler_factory import HandlerFactory
+from flask_transmute.function import TransmuteFunction
+from .handler_factory import generate_handler_method
+from flask_transmute import annotate
 
 
 class TornadoRouteSet(RouteSet):
@@ -28,4 +31,10 @@ def _create_handler(transmute_func):
     return Handler
 
 
-def convert_to_route(func):
+def convert_to_route(**options):
+
+    def decorator(fn):
+        transmute_func = TransmuteFunction(fn, **options)
+        return generate_handler_method(transmute_func)
+
+    return decorator

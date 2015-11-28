@@ -40,7 +40,7 @@ METHOD_MAP = {
 
 
 def _add_transmute_func_to_handler(transmute_func, handler):
-    handler_method = _generate_handler_method(transmute_func)
+    handler_method = generate_handler_method(transmute_func)
 
     is_get = True
     for attr, method in METHOD_MAP.items():
@@ -52,12 +52,12 @@ def _add_transmute_func_to_handler(transmute_func, handler):
         setattr(handler, "get", handler_method)
 
 
-def _generate_handler_method(transmute_func):
+def generate_handler_method(transmute_func):
 
     def method(self, *args):
         try:
             kwargs = _extract_args(self, transmute_func, args=args)
-            result = transmute_func.raw_func(*args, **kwargs)
+            result = transmute_func.raw_func(self, *args, **kwargs)
             self.set_header("Content-Type", "application/json")
             self.write({
                 "success": True,
@@ -76,5 +76,6 @@ def _generate_handler_method(transmute_func):
     return method
 
 
-def _extract_args(handler, transmute_func):
+def _extract_args(handler, transmute_func, args=None):
     kwargs = {}
+    return kwargs
