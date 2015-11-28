@@ -26,3 +26,6 @@ def _create_handler(transmute_func):
             self.write("Hello, " + transmute_func.description)
 
     return Handler
+
+
+def convert_to_route(func):

@@ -20,7 +20,7 @@ class TestApp(tornado.testing.AsyncHTTPTestCase):
 
 class ExampleHandler(tornado.web.RequestHandler):
 
-    @tornado_transmute.handle_args
+    @tornado_transmute.convert_to_route
     @tornado_transmute.annotate({"resource": str, "multiplier": int})
     def get(self, resource, multiplier=None):
-        pass
+        return "Foo"

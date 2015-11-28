@@ -54,10 +54,10 @@ def _add_transmute_func_to_handler(transmute_func, handler):
 
 def _generate_handler_method(transmute_func):
 
-    def method(self):
+    def method(self, *args):
         try:
-            kwargs = _extract_args(self, transmute_func)
-            result = transmute_func.raw_func(**kwargs)
+            kwargs = _extract_args(self, transmute_func, args=args)
+            result = transmute_func.raw_func(*args, **kwargs)
             self.set_header("Content-Type", "application/json")
             self.write({
                 "success": True,
