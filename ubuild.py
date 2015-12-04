@@ -3,6 +3,7 @@ import subprocess
 
 
 def main(build):
+    build.packages.install("../web-transmute", develop=True)
     build.packages.install(".", develop=True)
 
 

@@ -1,6 +1,6 @@
 import functools
 import json
-from flask_transmute.exceptions import ApiException
+from web_transmute.exceptions import ApiException
 
 
 def wrap_method(transmute_function):
@@ -9,7 +9,7 @@ def wrap_method(transmute_function):
     request hanlder method.
     """
     tf = transmute_function
-    is_post_method = tf.creates or tf.updates
+    is_post_method = "POST" in tf.http_methods
 
     api_exceptions = tuple(list(tf.error_exceptions or []) + [ApiException])
 

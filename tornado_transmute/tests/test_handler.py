@@ -16,12 +16,22 @@ class TestApp(tornado.testing.AsyncHTTPTestCase):
         assert resp.code == 200
         resp_json = json.loads(resp.body.decode("UTF-8"))
         assert resp_json.get("success")
-        assert resp_json.get("result") == "Foo"
+        assert resp_json.get("result") == 2
+
+    def test_foo_queryparam(self):
+        resp = self.fetch("/foo/bar?multiplier=2")
+        assert resp.code == 200
+        resp_json = json.loads(resp.body.decode("UTF-8"))
+        assert resp_json.get("success")
+        assert resp_json.get("result") == 4
 
 
 class ExampleHandler(tornado.web.RequestHandler):
 
     @tornado_transmute.convert_to_route()
-    @tornado_transmute.annotate({"resource": str, "multiplier": int})
-    def get(self, resource, multiplier=None):
-        return "Foo"
+    @tornado_transmute.annotate({
+        "resource": str, "multiplier": int,
+        "return": int
+    })
+    def get(self, resource, multiplier=1):
+        return 2 * multiplier
