@@ -51,7 +51,7 @@ def generate_handler_method(transmute_func):
 
     def method(self, *args):
         try:
-            kwargs = _extract_args_get(self, transmute_func, args=args)
+            args, kwargs = _extract_args_get(self, transmute_func, args=args)
             result = transmute_func.raw_func(self, *args, **kwargs)
             self.set_header("Content-Type", "application/json")
             self.write({
@@ -72,21 +72,23 @@ def generate_handler_method(transmute_func):
 
 
 def _extract_args_get(handler, transmute_func, args=None):
-    kwargs = {}
-    args = args or []
+    args, kwargs = args or [], {}
     # TODO: there needs to be a good strategy to parse out
     # positional arguments keyward arguments
     # (due to tornado accepting positional arguments matching regex.)
     index = len(args)
-    for arg in transmute_func.argspec.args[index:]:
-        args.append()
+    for arg in transmute_func.signature.args[index:]:
+        serializer = web_transmute.serializers[arg.type]
+        value = handler.get_query_argument(arg.name)
+        args.append(serializer.deserialize(value))
 
-    for name, info in transmute_func.arguments.items():
-        serializer = web_transmute.serializer[info.type]
+    for name, info in transmute_func.signature.kwargs.items():
+        serializer = web_transmute.serializers[info.type]
         value = handler.get_query_argument(name, default=None)
         if value is not None:
             kwargs[name] = serializer.deserialize(value)
-    return kwargs
+
+    return args, kwargs
 
 
 def _extract_args_post(handler, transmute_func, args=None):
@@ -100,20 +102,3 @@ def _extract_args_post(handler, transmute_func, args=None):
         if value is not None:
             kwargs[name] = serializer.deserialize(value)
     return kwargs
-
-
-def _convert_to_args_kwargs(argspec):
-    args, kwargs = [], {}
-    attributes = (getattr(argspec, "args", []) +
-                  getattr(argspec, "keywords", []))
-
-    for i, name in enumerate(reversed(attributes)):
-        if name == "self":
-            continue
-
-        if len(argspec.defaults) >= i:
-            kwargs[name] = argspec.defaults[i]
-        else:
-            args.insert(0, name)
-
-    return args, kwargs
