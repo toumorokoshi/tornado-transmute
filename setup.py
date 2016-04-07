@@ -14,7 +14,7 @@ install_requires = [
 tests_require = []
 
 setup(name='tornado-transmute',
-      version='0.0.1b',
+      version='0.0.1',
       description='a toolset to generate routes from objects for tornado.',
       long_description=open(README_PATH).read(),
       author='Yusuke Tsutsumi',
