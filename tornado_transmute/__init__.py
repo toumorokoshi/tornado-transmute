@@ -3,7 +3,8 @@ from web_transmute.function import TransmuteFunction
 from .handler import generate_handler_method
 from .swagger import (
     generate_swagger_json,
-    generate_swagger_json_handler
+    generate_swagger_json_handler,
+    add_swagger_static_routes
 )
 
 

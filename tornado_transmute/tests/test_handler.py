@@ -4,15 +4,22 @@ import tornado_transmute
 import json
 
 
+def _create_app():
+    app = tornado.web.Application([
+        ("/foo/([^\/]+)", ExampleHandler)
+    ])
+    swagger_handler = tornado_transmute.generate_swagger_json_handler(app)
+    tornado_transmute.add_swagger_static_routes(
+        app, "/swagger", "/swagger.json"
+    )
+    app.add_handlers(".*", [("/swagger.json", swagger_handler)])
+    return app
+
+
 class TestApp(tornado.testing.AsyncHTTPTestCase):
 
     def get_app(self):
-        app = tornado.web.Application([
-            ("/foo/([^\/]+)", ExampleHandler)
-        ])
-        swagger_handler = tornado_transmute.generate_swagger_json_handler(app)
-        app.add_handlers(".*", [("/swagger.json", swagger_handler)])
-        return app
+        return _create_app()
 
     def test_foo(self):
         resp = self.fetch("/foo/bar")
@@ -32,14 +39,17 @@ class TestApp(tornado.testing.AsyncHTTPTestCase):
         resp = self.fetch("/swagger.json")
         assert resp.code == 200
         resp_json = json.loads(resp.body.decode("UTF-8"))
-        assert resp_json == {
-            "paths": {},
-            "swagger": "2.0",
-            "info": {
-                "title": "swagger",
-                "version": "1.0"
-            }
+        assert "get" in resp_json["paths"]["/foo/([^\/]+)$"]
+        assert resp_json["swagger"] == "2.0"
+        assert resp_json["info"] == {
+            "title": "swagger", "version": "1.0"
         }
+
+    def test_swagger_body(self):
+        resp = self.fetch("/swagger")
+        assert resp.code == 200
+        body = resp.body.decode("UTF-8")
+        assert "swagger-section" in body
 
 
 class ExampleHandler(tornado.web.RequestHandler):
@@ -51,3 +61,8 @@ class ExampleHandler(tornado.web.RequestHandler):
     })
     def get(self, resource, multiplier=1):
         return 2 * multiplier
+
+if __name__ == "__main__":
+    app = _create_app()
+    app.listen(8888)
+    tornado.ioloop.IOLoop.current().start()
