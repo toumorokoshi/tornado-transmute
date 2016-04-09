@@ -1,9 +1,13 @@
 from web_transmute import *
 from web_transmute.function import TransmuteFunction
-from .handler_factory import generate_handler_method
+from .handler import generate_handler_method
+from .swagger import (
+    generate_swagger_json,
+    generate_swagger_json_handler
+)
 
 
-def convert_to_route(**options):
+def to_route(**options):
 
     def decorator(fn):
         transmute_func = TransmuteFunction(fn, **options)
