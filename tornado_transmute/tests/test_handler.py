@@ -19,7 +19,9 @@ def _create_app():
 class TestApp(tornado.testing.AsyncHTTPTestCase):
 
     def get_app(self):
-        return _create_app()
+        return tornado.web.Application([
+            ("/foo/([^\/]+)", ExampleHandler),
+        ])
 
     def test_foo(self):
         resp = self.fetch("/foo/bar")
