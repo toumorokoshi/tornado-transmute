@@ -1,20 +1,29 @@
 #!/usr/bin/env python
 import os
+import sys
 from setuptools import setup, find_packages
 
 base = os.path.dirname(os.path.abspath(__file__))
-
 README_PATH = os.path.join(base, "README.rst")
 
+is_release = False
+if "--release" in sys.argv:
+    is_release = True
+    sys.argv.remove("--release")
+
 install_requires = [
-    'web-transmute',
+    'transmute-core',
     'tornado'
 ]
 
 tests_require = []
 
 setup(name='tornado-transmute',
-      version='0.0.1',
+      setup_requires=["vcver"],
+      vcver={
+          "is_release": is_release,
+          "path": base
+      },
       description='a toolset to generate routes from objects for tornado.',
       long_description=open(README_PATH).read(),
       author='Yusuke Tsutsumi',

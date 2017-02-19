@@ -6,17 +6,14 @@ import json
 
 def _create_app():
     app = tornado.web.Application([
-        ("/foo/([^\/]+)", ExampleHandler)
+        # one can use tornado_transmute's route function here.
+        tornado_transmute.url("/foo/([^\/]+)", ExampleHandler),
     ])
-    swagger_handler = tornado_transmute.generate_swagger_json_handler(app)
-    tornado_transmute.add_swagger_static_routes(
-        app, "/swagger", "/swagger.json"
-    )
-    app.add_handlers(".*", [("/swagger.json", swagger_handler)])
+    tornado_transmute.add_swagger(app, "/swagger.json", "/swagger")
     return app
 
 
-class TestApp(tornado.testing.AsyncHTTPTestCase):
+class _SkipTestApp(tornado.testing.AsyncHTTPTestCase):
 
     def get_app(self):
         return tornado.web.Application([
@@ -56,13 +53,27 @@ class TestApp(tornado.testing.AsyncHTTPTestCase):
 
 class ExampleHandler(tornado.web.RequestHandler):
 
-    @tornado_transmute.to_route()
+    # convert_handler can be called to convert a route to
+    # a tornado handler.
+    @tornado_transmute.convert_to_handler()
     @tornado_transmute.annotate({
         "resource": str, "multiplier": int,
         "return": int
     })
+    @tornado.gen.coroutine
     def get(self, resource, multiplier=1):
         return 2 * multiplier
+
+# tornado_transmute also provides a RouteSet, which can output tornado-compatible url objects.
+# this provides a more flask-like approach, and handles combining routes which have the same path
+
+route_set = tornado_transmute.RouteSet()
+
+@tornado_transmute.route(route_set, paths="get")
+def foo():
+    pass
+
+route_set.generate_urls()
 
 if __name__ == "__main__":
     app = _create_app()

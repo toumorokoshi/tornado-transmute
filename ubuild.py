@@ -3,7 +3,6 @@ import subprocess
 
 
 def main(build):
-    build.packages.install("../web-transmute", develop=True)
     build.packages.install(".", develop=True)
 
 
@@ -21,15 +20,10 @@ def test(build):
     ])
 
 
-def distribute(build):
+def publish(build):
     """ distribute the uranium package """
     build.packages.install("wheel")
     build.executables.run([
         "python", "setup.py",
-        "sdist", "upload"
+        "sdist", "bdist_wheel", "--universal", "upload", "--release"
     ])
-
-
-def _download_swagger_ui(build):
-    pass
-    # _script: "uscripts/download_swagger_ui.py"

@@ -60,3 +60,4 @@ include/
 bin/
 .uranium
 .pydistutils.cfg
+VERSION

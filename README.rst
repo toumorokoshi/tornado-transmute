@@ -9,3 +9,10 @@ tornado-transmute
           If you are interested in developing this implementation, please contact me via github issue or e-mail
 
 route generation from function signatures in Python, for the tornado framework
+
+-------
+Caveats
+-------
+
+* In alpha.
+* transmute functions must be tornado coroutines.
