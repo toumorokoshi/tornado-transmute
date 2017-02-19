@@ -2,6 +2,7 @@ import tornado.web
 
 METHODS = ["get", "head", "post", "delete", "patch", "put", "options"]
 
+
 def url_spec(transmute_path, handler, *args, **kwargs):
     """
     convert the transmute_path
