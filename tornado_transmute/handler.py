@@ -9,24 +9,27 @@ from transmute_core import (
 def convert_to_handler(context=default_context):
 
     def decorator(fn):
+        func = tornado.gen.coroutine(fn)
         transmute_func = TransmuteFunction(fn)
 
         @tornado.gen.coroutine
         @wraps(transmute_func.raw_func)
-        def wrapper(self, *args, **kwargs):
+        def wrapper(self, *passed_args, **kwargs):
             exc = None
             content_type = self.request.headers.get("Content-Type", None)
-            param_extractor = ParamExtractorTornado()
+            param_extractor = ParamExtractorTornado(self, kwargs)
             args, kwargs = param_extractor.extract_params(
                 context, transmute_func, content_type
             )
-            result = yield transmute_func(*args, **kwargs)
+            args = list(passed_args) + args
+            result = yield func(self, *args, **kwargs)
             response = transmute_func.process_result(
                 context, result, exc, content_type
             )
             self.set_header("Content-Type", response["content-type"])
             self.set_status(response["code"])
             self.finish(response["body"])
+        wrapper.transmute_func = transmute_func
         return wrapper
 
     return decorator
@@ -34,10 +37,9 @@ def convert_to_handler(context=default_context):
 
 class ParamExtractorTornado(ParamExtractor):
 
-    def __init__(self, handler_self, path_args, path_kwargs):
+    def __init__(self, handler_self, path_kwargs):
         self._handler_self = handler_self
         self._request = handler_self.request
-        self._path_args = path_args
         self._path_kwargs = path_kwargs
 
     @property
@@ -58,3 +60,6 @@ class ParamExtractorTornado(ParamExtractor):
 
     def _path_argument(self, key):
         return self._path_kwargs.get(key, NoArgument)
+
+    def _get_framework_args(self):
+        return {}

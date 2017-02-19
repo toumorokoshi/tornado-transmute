@@ -1,3 +1,10 @@
+"""
+this is a currently inactive
+implementation of tornado-transmute:
+
+one that resembles vanilla tornado much more closely.
+"""
+
 import tornado.testing
 import tornado.web
 import tornado_transmute
@@ -23,14 +30,13 @@ class TestApp(tornado.testing.AsyncHTTPTestCase):
     def get_app(self):
         app = tornado.web.Application([
             # one can use tornado_transmute's route function here.
-            tornado_transmute.url("/foo/{multiplier}", ExampleHandler),
+            tornado_transmute.url_spec("/foo/{multiplier}", ExampleHandler),
         ])
-        tornado_transmute.add_swagger(app, "/swagger.json", "/swagger")
+        # tornado_transmute.add_swagger(app, "/swagger.json", "/swagger")
         return app
 
     def test_foo(self):
         resp = self.fetch("/foo/1")
         assert resp.code == 200
         resp_json = json.loads(resp.body.decode("UTF-8"))
-        assert resp_json.get("success")
-        assert resp_json.get("result") == 2
+        assert resp_json == 2
