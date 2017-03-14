@@ -1,3 +1,4 @@
+import sys
 import tornado.gen
 from functools import wraps
 from transmute_core import (
@@ -26,6 +27,7 @@ def convert_to_handler(context=default_context):
                 result = yield func(self, *args, **kwargs)
             except Exception as e:
                 exc = e
+                exc.__traceback__ = sys.exc_info()[2]
             response = transmute_func.process_result(
                 context, result, exc, content_type
             )
