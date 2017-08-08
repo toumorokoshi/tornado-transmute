@@ -13,7 +13,7 @@ if "--release" in sys.argv:
 
 install_requires = [
     'transmute-core',
-    'tornado'
+    'tornado<=4.4.2'
 ]
 
 tests_require = []

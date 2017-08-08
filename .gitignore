@@ -61,3 +61,4 @@ bin/
 .uranium
 .pydistutils.cfg
 VERSION
+pip-selfcheck.json
