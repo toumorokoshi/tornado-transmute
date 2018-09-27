@@ -62,3 +62,4 @@ bin/
 .pydistutils.cfg
 VERSION
 pip-selfcheck.json
+man
